@@ -113,22 +113,22 @@ class TestRowToList(object):
 
 
 class TestPreprocess(object):
-    @mock.patch("data.preprocessing_helpers.row_to_list", side_effect=row_to_list_bug_free)
-    @mock.patch("data.preprocessing_helpers.convert_to_int",side_effect=convert_to_int_bug_free)
-    def test_on_raw_data(self, raw_and_clean_data_file, row_to_list_mock, convert_to_int_mock):
+    # @mock.patch("data.preprocessing_helpers.row_to_list", side_effect=row_to_list_bug_free)
+    # @mock.patch("data.preprocessing_helpers.convert_to_int",side_effect=convert_to_int_bug_free)
+    def test_on_raw_data(self, raw_and_clean_data_file, mocker):
         raw_path, clean_path = raw_and_clean_data_file
-        # row_to_list_mock = mocker.patch("data.preprocessing_helpers.row_to_list", side_effect=row_to_list_bug_free)
-        # convert_to_int_mock = mocker.patch("data.preprocessing_helpers.convert_to_int",
-        #                                    side_effect=convert_to_int_bug_free
-        #                                    )
+        row_to_list_mock = mocker.patch("data.preprocessing_helpers.row_to_list", side_effect=row_to_list_bug_free)
+        convert_to_int_mock = mocker.patch("data.preprocessing_helpers.convert_to_int",
+                                           side_effect=convert_to_int_bug_free
+                                           )
         preprocess(raw_path, clean_path)
-        assert row_to_list_mock == [mock.call("1,801\t201,411\n"),
+        assert row_to_list_mock.call_args_list == [mock.call("1,801\t201,411\n"),
                                                    mock.call("1,767565,112\n"),
                                                    mock.call("2,002\t333,209\n"),
                                                    mock.call("1990\t782,911\n"),
                                                    mock.call("1,285\t389129\n")
                                                    ]
-        assert convert_to_int_mock == [mock.call("1,801"), mock.call("201,411"), mock.call("2,002"), mock.call("333,209"),
+        assert convert_to_int_mock.call_args_list == [mock.call("1,801"), mock.call("201,411"), mock.call("2,002"), mock.call("333,209"),
                                                       mock.call("1990"),  mock.call("782,911"), mock.call("1,285"), mock.call("389129")]
         with open(clean_path, "r") as f:
             lines = f.readlines()
